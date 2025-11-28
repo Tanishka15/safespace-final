@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const twilio = require('twilio');
 require('dotenv').config();
+const path = require('path');
 
 const app = express();
 
@@ -587,8 +588,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root endpoint
-app.get('/', (req, res) => {
+// API Info endpoint
+app.get('/api/info', (req, res) => {
   res.json({
     message: 'SafeSpace Emergency API',
     version: '3.0.0',
@@ -603,6 +604,14 @@ app.get('/', (req, res) => {
     },
     twilioStatus: twilioClient ? '✅ Configured' : '⚠️ Not Configured'
   });
+});
+
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Anything that doesn't match the above, send back index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 const PORT = process.env.PORT || 5001;
